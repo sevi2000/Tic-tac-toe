@@ -16,6 +16,7 @@ env:
   UUID: '999ebf26-79b4-11ee-b962-0242ac120002'
 jobs:
   releaseJob:
+    permissions: write-all
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     outputs:
