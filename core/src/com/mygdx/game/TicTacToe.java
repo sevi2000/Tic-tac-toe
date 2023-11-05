@@ -8,12 +8,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
@@ -27,6 +24,7 @@ public class TicTacToe extends Game {
 	Stage stg;
 	boolean display = true;
 	BitmapFont font;
+	boolean displayedDialog = false;
 
 	ArrayList<FieldElement> elements =  new ArrayList<>();
 	Texture texture;
@@ -71,18 +69,11 @@ public class TicTacToe extends Game {
 		sd.filledRectangle(0,Gdx.graphics.getWidth()/3*2,Gdx.graphics.getWidth(),1);
 		batch.end();
 		if (
-				checkTriplet(elements.get(0),elements.get(1),elements.get(2)) ||//first col
-						checkTriplet(elements.get(0),elements.get(3),elements.get(6)) ||// last line
-						checkTriplet(elements.get(0),elements.get(4),elements.get(8)) ||// / diag
-						checkTriplet(elements.get(1),elements.get(4),elements.get(7))|| // mid line
-						checkTriplet(elements.get(2),elements.get(5),elements.get(8))|| // first line
-						checkTriplet(elements.get(3),elements.get(4),elements.get(5))|| // mid col
-						checkTriplet(elements.get(6),elements.get(7),elements.get(8))||// last col
-						checkTriplet(elements.get(2),elements.get(4),elements.get(6))// \ diag
-
+				isGameOver()
 
 
 		) {
+			if (!displayedDialog){
 			//font.draw(batch, won, 10, 460); // Draw text at (100, 100)
 
 			FileHandle handler = Gdx.files.internal("comic/skin/comic-ui.json");
@@ -91,6 +82,7 @@ public class TicTacToe extends Game {
 				public void result(Object obj) {
 					if ((boolean)obj){
 						restart();
+						displayedDialog = false;
 						remove();
 						System.out.println("removed dialog");
 					}else {Gdx.app.exit();}
@@ -100,7 +92,9 @@ public class TicTacToe extends Game {
 			dialog.button("Yes", true); //sends "true" as the result
 			dialog.button("No", false); //sends "false" as the result
 			dialog.show(stg);
+			displayedDialog = true;
 
+		}
 		}
 		stg.draw();
 
@@ -115,6 +109,18 @@ public class TicTacToe extends Game {
 	@Override
 	public void dispose () {
 		batch.dispose();
+	}
+
+	public boolean isGameOver(){
+		return checkTriplet(elements.get(0),elements.get(1),elements.get(2)) ||//first col
+				checkTriplet(elements.get(0),elements.get(3),elements.get(6)) ||// last line
+				checkTriplet(elements.get(0),elements.get(4),elements.get(8)) ||// / diag
+				checkTriplet(elements.get(1),elements.get(4),elements.get(7))|| // mid line
+				checkTriplet(elements.get(2),elements.get(5),elements.get(8))|| // first line
+				checkTriplet(elements.get(3),elements.get(4),elements.get(5))|| // mid col
+				checkTriplet(elements.get(6),elements.get(7),elements.get(8))||// last col
+				checkTriplet(elements.get(2),elements.get(4),elements.get(6));// \ diag
+
 	}
 
 	public boolean checkTriplet(FieldElement f1,FieldElement f2, FieldElement f3){
