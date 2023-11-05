@@ -10,7 +10,7 @@ env:
   JAVA_DISTRIBUTION: 'temurin'
   JRE_VERSION: '18.0.8f'
   GITHUB_TOKEN: ${{ github.token }}
-  ARTIFACT_NAME: 'Tic-Tac-Toe'
+  ARTIFACT_NAME: 'Tic-tac-toe'
   USER_NAME: 'Sevi2000'
   USER_EMAIL: 'sevidervishi@outlook.fr'
   UUID: '999ebf26-79b4-11ee-b962-0242ac120002'
