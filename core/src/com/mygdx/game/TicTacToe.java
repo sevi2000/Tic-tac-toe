@@ -1,18 +1,17 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import space.earlygrey.shapedrawer.ShapeDrawer;
 
 import java.util.ArrayList;
@@ -25,8 +24,10 @@ public class TicTacToe extends Game {
 	Stage stg;
 	boolean display = true;
 	BitmapFont font;
+	boolean displayedDialog = false;
 
 	ArrayList<FieldElement> elements =  new ArrayList<>();
+	Texture texture;
 
 	@Override
 	public void create () {
@@ -51,7 +52,7 @@ public class TicTacToe extends Game {
 			stg.addActor(elt);
 		}
 		font = new BitmapFont();
-
+		this.texture = new Texture("badlogic.jpg");
 	}
 
 	@Override
@@ -66,38 +67,60 @@ public class TicTacToe extends Game {
 		sd.filledRectangle(0,Gdx.graphics.getWidth()/3,Gdx.graphics.getWidth(),1);
 		sd.setColor(Color.BLUE);
 		sd.filledRectangle(0,Gdx.graphics.getWidth()/3*2,Gdx.graphics.getWidth(),1);
-
 		batch.end();
-		stg.draw();
 		if (
-				checkTriplet(elements.get(0),elements.get(1),elements.get(2)) ||//first col
-						checkTriplet(elements.get(0),elements.get(3),elements.get(6)) ||// last line
-						checkTriplet(elements.get(0),elements.get(4),elements.get(8)) ||// / diag
-						checkTriplet(elements.get(1),elements.get(4),elements.get(7))|| // mid line
-						checkTriplet(elements.get(2),elements.get(5),elements.get(8))|| // first line
-						checkTriplet(elements.get(3),elements.get(4),elements.get(5))|| // mid col
-						checkTriplet(elements.get(6),elements.get(7),elements.get(8))||// last col
-						checkTriplet(elements.get(2),elements.get(4),elements.get(6))// \ diag
+				isGameOver()
 
 
-
-		){
-			String won = FieldElement.lastTurn.not() == Type.O? "X wins": "O wins";
-			System.out.println(won);
+		) {
+			if (!displayedDialog){
 			//font.draw(batch, won, 10, 460); // Draw text at (100, 100)
+
+			FileHandle handler = Gdx.files.internal("comic/skin/comic-ui.json");
+			Skin uiSkin = new Skin(handler);
+			Dialog dialog = new Dialog("Warning", uiSkin, "default") {
+				public void result(Object obj) {
+					if ((boolean)obj){
+						restart();
+						displayedDialog = false;
+						remove();
+						System.out.println("removed dialog");
+					}else {Gdx.app.exit();}
+				}
+			};
+			dialog.text( (FieldElement.lastTurn == Type.O ?"🅾️":"🇽") + "wins Do you want to replay?");
+			dialog.button("Yes", true); //sends "true" as the result
+			dialog.button("No", false); //sends "false" as the result
+			dialog.show(stg);
+			displayedDialog = true;
+
 		}
-		if (display){
-		for (FieldElement elt: elements) {
-			System.out.println("x : " + elt.getX() + " y : " + elt.getY());
 		}
-		display = false;
-		}
+		stg.draw();
 
 	}
-	
+
+	private void restart() {
+		for (FieldElement e: elements){
+			e.type = Type.BLANK;
+		}
+	}
+
 	@Override
 	public void dispose () {
 		batch.dispose();
+	}
+
+	public boolean isGameOver(){
+		return checkTriplet(elements.get(0),elements.get(1),elements.get(2)) ||//first col
+				checkTriplet(elements.get(0),elements.get(3),elements.get(6)) ||// last line
+				checkTriplet(elements.get(0),elements.get(4),elements.get(8)) ||// / diag
+				checkTriplet(elements.get(1),elements.get(4),elements.get(7))|| // mid line
+				checkTriplet(elements.get(2),elements.get(5),elements.get(8))|| // first line
+				checkTriplet(elements.get(3),elements.get(4),elements.get(5))|| // mid col
+				checkTriplet(elements.get(6),elements.get(7),elements.get(8))||// last col
+				checkTriplet(elements.get(2),elements.get(4),elements.get(6));// \ diag
+
 	}
 
 	public boolean checkTriplet(FieldElement f1,FieldElement f2, FieldElement f3){
