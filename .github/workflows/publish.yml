@@ -81,8 +81,8 @@ jobs:
             os: ubuntu-latest
           - launcher-extension: rpm
             os: ubuntu-latest
-          # - launcher-extension: exe
-          #   os: windows-latest
+          - launcher-extension: exe
+            os: windows-latest
           # - launcher-extension: msi
           #   os: windows-latest
           # - launcher-extension: dmg
